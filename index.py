@@ -95,6 +95,7 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 # make a one-step forecast
 def forecast_lstm(model, batch_size, X):
 	X = X.reshape(1, 1, len(X))
+	print(X)
 	yhat = model.predict(X, batch_size=batch_size)
 	return yhat[0,0]
 
@@ -126,20 +127,21 @@ scaler, train_scaled, test_scaled = scale(train, test)
 
 print(train_scaled)
 print(test_scaled)
-pyplot.plot(train)
+# pyplot.plot(train)
 # pyplot.plot(train_scaled)
-pyplot.show()
+# pyplot.show()
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 1, 10)
+batchSize = 1
+lstm_model = fit_lstm(train_scaled, batchSize, 12, 5)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
-lstm_model.predict(train_reshaped, batch_size=1)
+lstm_model.predict(train_reshaped, batch_size=batchSize)
 
 predictionsTrain = list()
 for i in range(len(train_scaled)):
 	# make one-step forecast
 	X, y = train_scaled[i, 0:-1], train_scaled[i, -1]
-	yhat = forecast_lstm(lstm_model, 1, X)
+	yhat = forecast_lstm(lstm_model, batchSize, X)
 	# yhat = y
 	# invert scaling
 	yhat = invert_scale(scaler, X, yhat)
@@ -164,7 +166,7 @@ predictions = list()
 for i in range(len(test_scaled)):
 	# make one-step forecast
 	X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
-	yhat = forecast_lstm(lstm_model, 1, X)
+	yhat = forecast_lstm(lstm_model, batchSize, X)
 	# yhat = y
 	# invert scaling
 	yhat = invert_scale(scaler, X, yhat)
